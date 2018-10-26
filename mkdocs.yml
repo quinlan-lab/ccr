@@ -1,0 +1,9 @@
+site_name: CCR
+site_url: https://github.com/quinlan-lab/ccr
+repo_url: https://github.com/quinlan-lab/ccr
+pages:
+- Home: index.md
+- New Versions: updates.md
+- Examples:
+    - gnomAD: examples/gnomad.md
+theme: cinder
