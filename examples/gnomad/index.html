@@ -144,7 +144,7 @@ This script runs <code>regions.sh</code> and contains the examples of how the co
 <li>-v allows you to choose the name of the results folder you store the results in. This will be in the directory results inside of this folder. It can be a name, the date you ran it, whatever you like.</li>
 <li>-x allows you to pass files of choice (you don't have to pass any) to exclude regions from the genome when generating your model.  We recommend excluding segmental duplications and self-chains of 90% sequence identity, as these regions are unreliable when short reads are used to call variants.</li>
 <li>-s tells the model to calculate synonymous variant density, which you may not want as the model takes a lot longer to do so. If you do this without the -c option for CpG, it will calculate a model based on coverage-scaled length and synonymous density instead of CpG content.</li>
-<li>-r removes synonymous density from the model and just puts it as a field in the BED file.  We did this for our model version, CpG content only.</li>
+<li>-u removes synonymous density from the model and just puts it as a field in the BED file.  We did this for our model version, CpG content only.</li>
 <li>-e will use the version of regions.sh that incorporates ExAC v1 (assuming you downloaded it in getfiles.sh).</li>
 <li>-g will use the version of regions.sh that incorporates gnomAD (or ExAC v2), downloaded by default in getfiles.sh.</li>
 <li>-c triggers CpG density input into the model.  This is the version used in the manuscript.  It will always be calculated.</li>
@@ -153,7 +153,7 @@ This script runs <code>regions.sh</code> and contains the examples of how the co
 <li>-w is the version we used in the manuscript where variants are separate from CCRs.  Variants are merged together if overlapping INDELs and treated as one large region of non-constraint.  It may be you want to incorporate variants into the regions, but the code to do so is quite old.  We recommend that you use this version.</li>
 <li>-d allows you to pass a coverage depth and a coverage cutoff into the model.  As in the manuscript the default is 10x at 50%.  So, 10 and 0.5.  Separate inputs with spaces.</li>
 <li>-r allows you to only run the model on one chromosome or a couple if you like.  We used this option to run CCRs just for the X chromosome quickly, as in the manuscript. Like -d, separate inputs with spaces.</li>
-<li>-q will let you exclude certain chromosomes from your analysis.  The default is none but as in the manuscript, we recommend using this to get autosomal CCRs and excluding X and Y.  But if you want everything just run with a blank.  Like -d, separate inputs with spaces.</li>
+<li>-q will let you exclude certain chromosomes from your analysis.  The default is Y but as in the manuscript, we recommend using this to get autosomal CCRs and excluding X and Y.  But if you want everything just run with a blank.  Like -d, separate inputs with spaces.</li>
 </ul>
 <h3 id="about-the-model-code">About the model code</h3>
 <p><code>regions.sh</code> will run <code>exac-regions.py</code> and <code>resid-plot.py</code> (it also runs <code>weightpercentile.py</code>) using the above.  If you want more information on the inputs to those individual functions, just run the python scripts with -h to get the descriptions of all the inputs.  You do not have to use regions.sh to run the model.</p>
