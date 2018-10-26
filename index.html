@@ -120,70 +120,46 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#ccr-scripts">CCR Scripts</a></li>
-            <li class="second-level"><a href="#exac-regionspy">exac-regions.py</a></li>
+        <li class="first-level active"><a href="#creating-ccrs">Creating CCRs</a></li>
+            <li class="second-level"><a href="#regionssh">regions.sh</a></li>
                 
-            <li class="second-level"><a href="#resid-plotpy">resid-plot.py</a></li>
-                
-            <li class="second-level"><a href="#weightpercentilepy">weightpercentile.py</a></li>
-                
-            <li class="second-level"><a href="#utilspy">utils.py</a></li>
+            <li class="second-level"><a href="#about-the-model-code">About the model code</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="ccr-scripts">CCR Scripts</h1>
-<p>This repo will allow you to create the model as we did.  If you want to run the model as in the paper, go to Examples --&gt; gnomAD.</p>
-<h2 id="exac-regionspy">exac-regions.py</h2>
-<p>This script generates the regions devoid of genetic variation.  It utilizes scripts in <code>utils.py</code> to do so.  Regions are actually calculated using the functions in <code>utils.py</code> which will be explained in the next section.</p>
+<h1 id="creating-ccrs">Creating CCRs</h1>
+<p>This repo will allow you to create the model as we did.</p>
+<p>First, run <code>bash getfiles.sh</code> to grab everything you need.  This will also run <code>bash varmake.sh</code> and create vt decomposed and normalized files for the gnomAD VCF annotated with appropriate VEP fields.  It may take a while.  This also uses <code>get-chain.py</code> to create the self-chain file and creates the results and data folders in this folder.</p>
+<p>Then run <code>bash sbatch.sh</code> to run the jobs individually.  This can be sent to a compute cluster if preferred.
+This script runs <code>regions.sh</code> and contains the examples of how the code is run to obtain the versions used in the manuscript.</p>
+<h3 id="regionssh">regions.sh</h3>
+<p>So to run the model as we did in the manuscript, we used the following command:</p>
+<pre><code>bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g
+</code></pre>
+
+<p>So the options for running <code>regions.sh</code> are as follows:</p>
 <ul>
-<li>-n will prevent singletons from being used in the model.  If you do not trust variants with an allele count of 1 in your VCF file, this may be an option you are interested in.  Alternatively, if you are trying to create a recessive model you may not want these either.  In the future, this may be replaced by an allele count option (e.g., AC=2,Hom=1).</li>
-<li>-w is a necessary option as of now.  It is the version we used in the manuscript where variants are separate from CCRs.  Originally, the downstream variant was included in the region definition.  Now, that is no longer the case.  Variants are merged together if overlapping INDELs and treated as one large region of non-constraint.  If you want to incorporate variants into the regions, be aware the code to do so is outdated, and likely will be bugged.  We recommend that you use this version.</li>
-<li>-x tells the code where your vt decomposed, normalized and VEP annotated variant file is.  You definitely want the VEP fields used in varmake.sh.  You can just run <code>bash varmake.sh</code> on whatever your VCF file is and look for it with the partial name of the file added to "-vep-vt.vcf.gz".</li>
-<li>-e tells the code where your Ensembl formatted exons file is.  You want this in GTF gzipped format.</li>
-<li>-c tells the code where the coverage files are.  We recommend you create a data folder and store them in there.  There should be one for each chromosome.  The actual input is formatted like <code>data/gnomad.exomes.r2.0.2.chr{chrom}.coverage.txt.gz</code> so it will pull the file for each chromosome internally using the literal string <code>{chrom}</code> it just needs to know where to look.</li>
-<li>-d allows you to pass a coverage depth into the model.  The default is 10 for 10x coverage, as in the manuscript.</li>
-<li>-l allows you to provide a proportional cutoff for coverage into the model.  As in the manuscript the default is 0.5, or 50% of individuals in your dataset that have at least the coverage depth you provided in the -d option.</li>
-<li>-f will use a FASTA file of your choice to calculate CpG density.  The default is the GRCh37/hg19 FASTA downloaded from our s3 server by getfiles.sh.  You do want to make sure it does NOT start with chr.</li>
-<li>-s tells the code where your exclude files are.  There are no defaults, but in the manuscript we used gzipped BED files of segmental duplications and self-chains of 90% identity as short reads are unreliable in those regions of the genome.  You can use any exclusionary BED.gz files here.</li>
+<li>-v allows you to choose the name of the results folder you store the results in. This will be in the directory results inside of this folder. It can be a name, the date you ran it, whatever you like.</li>
+<li>-x allows you to pass files of choice (you don't have to pass any) to exclude regions from the genome when generating your model.  We recommend excluding segmental duplications and self-chains of 90% sequence identity, as these regions are unreliable when short reads are used to call variants.</li>
+<li>-s tells the model to calculate synonymous variant density, which you may not want as the model takes a lot longer to do so. If you do this without the -c option for CpG, it will calculate a model based on coverage-scaled length and synonymous density instead of CpG content.</li>
+<li>-r removes synonymous density from the model and just puts it as a field in the BED file.  We did this for our model version, CpG content only.</li>
+<li>-e will use the version of regions.sh that incorporates ExAC v1 (assuming you downloaded it in getfiles.sh).</li>
+<li>-g will use the version of regions.sh that incorporates gnomAD (or ExAC v2), downloaded by default in getfiles.sh.</li>
+<li>-c triggers CpG density input into the model.  This is the version used in the manuscript.  It will always be calculated.</li>
+<li>-n will prevent singletons from being used in the model.  If you do not believe in variants that occur only once in your VCF input file, this may be an option you are interested in.</li>
+<li>-f will use a FASTA file of your choice to calculate CpG density.  The default is the GRCh37/hg19 FASTA downloaded from our s3 server by getfiles.sh. </li>
+<li>-w is the version we used in the manuscript where variants are separate from CCRs.  Variants are merged together if overlapping INDELs and treated as one large region of non-constraint.  It may be you want to incorporate variants into the regions, but the code to do so is quite old.  We recommend that you use this version.</li>
+<li>-d allows you to pass a coverage depth and a coverage cutoff into the model.  As in the manuscript the default is 10x at 50%.  So, 10 and 0.5.  Separate inputs with spaces.</li>
+<li>-r allows you to only run the model on one chromosome or a couple if you like.  We used this option to run CCRs just for the X chromosome quickly, as in the manuscript. Like -d, separate inputs with spaces.</li>
+<li>-q will let you exclude certain chromosomes from your analysis.  The default is none but as in the manuscript, we recommend using this to get autosomal CCRs and excluding X and Y.  But if you want everything just run with a blank.  Like -d, separate inputs with spaces.</li>
 </ul>
-<p>Make sure you save the output to a file, by default it is printed to stdout.
-<code>exac-regions.py</code> runs using the multiprocessing package, so debugging may be difficult for those less experienced.</p>
-<h2 id="resid-plotpy">resid-plot.py</h2>
-<p>This script is used to take the output of <code>exac-regions.py</code> and creates the model for the regions.  It also calculates synonymous density. Synonymous density calculation currently takes a very long time, so it may be in the interest of the user to forgo the calculation if iterating through several different model versions.  In the future it should be trivial to add more aspects to the model or switch from linear regression to a logistic regression model or some other ML model.  This script does use one function from <code>utils.py</code>, which is <code>issynonymous</code> to aid with determination of whether variants are synonymous or not.</p>
-<ul>
-<li>-c triggers CpG density input into the model.  This is used in the manuscript's model.  It will always be calculated no matter what because it is already calculated in the output of <code>exac-regions.py</code>.</li>
-<li>-s tells the model to calculate synonymous variant density, which you may not want as the model takes a lot longer to do so. If you do this without the -c option for CpG, it will calculate a model based on coverage-scaled length and synonymous density instead of CpG content.  If you want to calculate the density, but not incorporate it into the model, use -r with -s.</li>
-<li>-f tells the code where your input file is.  This is the output from exac-regions.py.</li>
-<li>-n tells the script not to use singletons for synonymous density calculation.  You don't need this option unless you invoke -s.  Also, if you feel confident in your variant calls, there is no reason to use this option.</li>
-<li>-w is a necessary option as of now.  It assumes there is a "varflag" field.  It is the version we used in the manuscript where variants are separate from true CCRs.  Originally, the downstream variant was included in the region definition, but we no longer do so.  If you want to incorporate variants into the regions it must have been done already at the <code>exac-regions.py</code> step, and you should be very aware the code to do so is outdated, and likely will be bugged.  We recommend that you use this flag.</li>
-<li>-p allows you to only run the model on one chromosome or a few of them.  We used this option to run a CCR model based solely on the X chromosome, as in the manuscript. If using multiple chromosomes, e.g. X Y, separate inputs with spaces.</li>
-<li>-x will let you exclude certain chromosomes from your analysis.  The default is Y but as in the manuscript, we recommend using this to get autosomal CCRs and excluding X and Y.  But if you want everything just run with a blank.  Separate inputs with spaces.</li>
-<li>-q will create a version of the full model where the X chromosome is waited differently based on the allele count max in areas not in pseudoautosomal regions.  Only relevant if using the autosomes and at least the X chromosome.  It could be used for an X-only model, but would have little point.</li>
-<li>-r removes synonymous density from the model and just uses the calculation invoked by -s as a field in the BED file.  We did this for our manuscript, where the model uses CpG content only.  No need to use this option without -s.</li>
-</ul>
-<p>This script will produce its output in stdout.  Capture it in a file, and make sure that the file is sorted by percentile (the last column) and the header as the first line before passing the file into <code>weightpercentile.py</code>.</p>
-<h2 id="weightpercentilepy">weightpercentile.py</h2>
-<p>This only takes one input, the file from <code>resid-plot.py</code> sorted by percentile, keeping the header.</p>
-<p>This script recalculates the percentile scale using the percentiles from <code>resid-plot.py</code>.  It starts at 100 (the most constrained region) and scales it down proportionally for each subsequent region by the fraction of the length of protein-coding exome already covered by the preceding region.  It is highly recommended that you use this script to create the final percentiles as the percentiles created by <code>resid-plot.py</code> are very imbalanced.  The output of this file contains the final CCRs for your input variant set and exons of choice.  This is the end of the pipeline.</p>
-<h2 id="utilspy">utils.py</h2>
-<p>This script contains all the functions necessary for creating the regions as well as a few other useful functions.  There are several doctests for each function that check if they work as expected.</p>
-<ul>
-<li><code>overlaps</code> is used to help check if exclusionary ranges overlap generated regions in the function <code>split_ranges</code>.</li>
-<li><code>split_ranges</code> takes the output of the functions <code>get_ranges</code> and <code>read_exons</code> and splits generated regions on exclude files provided by the user.</li>
-<li><code>get_ranges</code> is the star of the program.  It takes variant start coordinate data, end coordinate data (if INDEL, it is longer), and the exon_starts and exon_ends for all transcripts for a gene acquired from <code>read_exons</code>, as well as the relevant chromosome for multiprocessing purposes.  It also takes in the last coordinate used as either a variant or the end of the region.  It can create long chains of INDELs as one region of non-constraint and regions of true constraint with no variation.  This is also how multi-exon regions are generated.  If there are several VARFALSE flagged regions in the output, it is a multi-exon region.  There are numerous doctests for this function for the many corner cases.  If -w is used in <code>exac-regions.py</code> this is the function used.  </li>
-<li><code>get_ranges_w_variant</code> is the old function for generating regions including the variant on the edge, but is outdated.  Do not use this function without checking it first.</li>
-<li><code>path</code> just expands the variables in the path.</li>
-<li><code>floatfmt</code> is mostly for formatting the float value of CpG density into a shorter string.</li>
-<li><code>read_coverage</code> uses the relevant chromosome's coverage file, for the depth provided by the user, and creates an array of the proportion of individuals at that depth into a numpy array for the appropriate coordinates.</li>
-<li><code>read_exons</code> uses the Ensembl GTF file and the coverage cutoff proportion as well as the exclude files provided by the user to get all the exon starts and ends flattened across all transcripts in an IntervalSet object for use by <code>get_ranges</code>.  It also outputs the Interval objects to split the ranges on in <code>split_ranges</code> for later.</li>
-<li><code>get_cdna_start_end</code> gets cDNA coordinate information from VEP annotations on the variant entries.  However, this is no longer used for any particular purpose in <code>exac-regions.py</code>.</li>
-<li><code>isfunctional</code> is the function used to determine if any variant is protein-altering in the variant input set which is what is used to break regions in <code>exac-regions.py</code>.</li>
-<li><code>ismissense</code> works similarly to <code>isfunctional</code> but only checks if a variant alters one amino acid.</li>
-<li><code>issynonymous</code> is actually used in <code>resid-plot.py</code> to check if a variant alters a codon but does not change the protein product.  It is used for synonymous density calculation.</li>
-<li><code>cg_content</code> is used to calculate CpG dinucleotide density for <code>exac-regions.py</code> to be passed into the model generated in <code>resid-plot.py</code>.</li>
-</ul></div>
+<h3 id="about-the-model-code">About the model code</h3>
+<p><code>regions.sh</code> will run <code>exac-regions.py</code> and <code>resid-plot.py</code> (it also runs <code>weightpercentile.py</code>) using the above.  If you want more information on the inputs to those individual functions, just run the python scripts with -h to get the descriptions of all the inputs.  You do not have to use regions.sh to run the model.</p>
+<p><code>exac-regions.py</code> is the python code that generates the regions.  It utilizes the functions in the script <code>utils.py</code> to do so.  The functions in <code>utils.py</code> would need to be modified if you wanted to change the way regions are calculated.  <code>exac-regions.py</code> runs using parallel processing, so debugging may be difficult for those less experienced.</p>
+<p><code>resid-plot.py</code> is the code to create the model and calculate synonymous density.  Synonymous density calculation currently takes a very long time, so it may be in the interest of the user to forgo the calculation if iterating through several different model versions.</p>
+<p><code>weightpercentile.py</code> calculates the length-scaled percentiles off of the far-less balanced ones generated by <code>resid-plot.py</code>.  It is highly recommened you use this script to create the final percentiles. </p></div>
         
     </div>
 
@@ -237,5 +213,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2018-10-26 09:30:14
+Build Date UTC : 2018-10-26 07:04:53
 -->
