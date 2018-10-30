@@ -70,12 +70,6 @@
                 
                 
                 
-                    <li >
-                        <a href="../../updates/">New Versions</a>
-                    </li>
-                
-                
-                
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Examples <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -83,6 +77,12 @@
                             
 <li class="active">
     <a href="./">gnomAD</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../updates/">New Versions</a>
 </li>
 
                         
@@ -99,12 +99,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../../updates/">
+                        <a rel="next" href="../..">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li class="disabled">
-                        <a rel="prev" >
+                    <li >
+                        <a rel="prev" href="../updates/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -120,7 +120,7 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#creating-ccrs">Creating CCRs</a></li>
+        <li class="first-level active"><a href="#creating-ccrs-as-in-the-paper">Creating CCRs as in the paper</a></li>
             <li class="second-level"><a href="#regionssh">regions.sh</a></li>
                 
             <li class="second-level"><a href="#about-the-model-code">About the model code</a></li>
@@ -129,13 +129,21 @@
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="creating-ccrs">Creating CCRs</h1>
-<p>This repo will allow you to create the model as we did.</p>
-<p>First, run <code>bash getfiles.sh</code> to grab everything you need.  This will also run <code>bash varmake.sh</code> and create vt decomposed and normalized files for the gnomAD VCF annotated with appropriate VEP fields.  It may take a while.  This also uses <code>get-chain.py</code> to create the self-chain file and creates the results and data folders in this folder.</p>
-<p>Then run <code>bash sbatch.sh</code> to run the jobs individually.  This can be sent to a compute cluster if preferred.
-This script runs <code>regions.sh</code> and contains the examples of how the code is run to obtain the versions used in the manuscript.</p>
+<h1 id="creating-ccrs-as-in-the-paper">Creating CCRs as in the paper</h1>
+<p>This repo will allow you to create the model as we did.  This is a great way to get a quickstart on how the model is run.  Run these two simple bash commands and it will run all the python scripts and bash code you need to grab all files and create the CCR model files.</p>
+<p>First, run:</p>
+<pre><code>bash getfiles.sh
+</code></pre>
+
+<p>to grab everything you need.  This will also run <code>bash varmake.sh</code> and create vt decomposed and normalized files for the gnomAD VCF annotated with appropriate VEP fields.  It may take a while.  This also uses <code>get-chain.py</code> to create the self-chain file and creates the <code>results</code> and <code>data</code> folders in this folder.  The output of this script goes entirely into the <code>data</code> folder.  The segmental duplication and self-chain files <code>segmental.bed.gz</code> and <code>self-chains.id90.bed.gz</code> are placed into this folder, the GRCh37 FASTA file <code>grch37.fa</code>, the Ensembl exons GTF file <code>Homo_sapiens.GRCh37.75.gtf.gz</code>, the first version gnomAD VCF <code>gnomad.exomes.r2.0.1.sites.vcf.gz</code>, and lastly the coverage files for gnomAD labeled as <code>gnomad.exomes.r2.0.2.chr$i.coverage.txt.gz</code> with <code>$i</code> replaced with each chromosome name.  The <code>varmake.sh</code> script takes the gnomAD VCF file and outputs a decomposed, normalized, VEP-annotated file called <code>gnomad-vep-vt.vcf.gz</code> in the same folder.</p>
+<p>Then run:</p>
+<pre><code>bash sbatch.sh
+</code></pre>
+
+<p>to run <code>regions.sh</code> for all versions of the model found in the manuscript.  It contains examples of how the code is run to obtain the versions used in the manuscript.  It creates output using <code>regions.sh</code> in three folders.  <code>results/gnomAD10.x5syn</code> is the full autosome-based model used in the paper.  <code>results/ExACv1syn</code> is the version for ExAC v1 which only uses 60,706 exomes which is also referenced in the paper's supplementary figures.  Lastly, <code>results/Xchromonly</code> is the X chromosome only version of CCR, dubbed X-CCR, which is also referenced in the paper's supplement.</p>
+<p>In each results folder, <code>weightedresiduals-cpg-synonymous-novariant.txt</code> is the final file containing all CCRs with appropriately adjusted percentiles.  The <code>resids-cpg-synonymous-novariant.txt</code> is the file before size-weighted percentile adjustment, and <code>exac-regions-novariant.txt</code> is the file of all the regions generated with no model applied to ranking them at all.</p>
 <h3 id="regionssh">regions.sh</h3>
-<p>So to run the model as we did in the manuscript, we used the following command:</p>
+<p>So to run the full autosomal model as we did in the manuscript, we used the following command:</p>
 <pre><code>bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g
 </code></pre>
 
