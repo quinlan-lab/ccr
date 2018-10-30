@@ -380,6 +380,7 @@ def read_coverage(chrom, cov=10, length=249250621, path="data/exacv2.chr{chrom}.
 
 
 def read_exons(gtf, chrom, cutoff, coverage_array, exclude):
+    from itertools import compress
     genes = defaultdict(IntervalSet)
     splitters = defaultdict(IntervalSet)
 
@@ -406,9 +407,12 @@ def read_exons(gtf, chrom, cutoff, coverage_array, exclude):
             #else:
             #    f2.write("\t".join(toks)+"\n") # segdups
                 
-
     for toks in (x.rstrip('\r\n').split("\t") for x in ts.nopen(gtf) if x[0] != "#"):
-        if toks[2] not in("CDS", "stop_codon") or toks[1] not in("protein_coding"): continue
+        splits=toks[-1].split(";")
+        bools=['gene_biotype' in i for i in splits]
+        biotype=list(compress(splits,bools))[0].strip()
+        print >> sys.stderr, biotype
+        if toks[2] not in("CDS", "stop_codon") or "protein_coding" not in biotype: continue
         #if toks[0] != "1": break
         start, end = map(int, toks[3:5])
         gene = toks[8].split('gene_name "')[1].split('"', 1)[0]
