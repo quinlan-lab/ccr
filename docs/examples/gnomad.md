@@ -1,21 +1,28 @@
-Creating CCRs
+Creating CCRs as in the paper
 ==============
 
-This repo will allow you to create the model as we did.
+This repo will allow you to create the model as we did.  This is a great way to get a quickstart on how the model is run.  Run these two simple bash commands and it will run all the python scripts and bash code you need to grab all files and create the CCR model files.
 
-First, run `bash getfiles.sh` to grab everything you need.  This will also run `bash varmake.sh` and create vt decomposed and normalized files for the gnomAD VCF annotated with appropriate VEP fields.  It may take a while.  This also uses `get-chain.py` to create the self-chain file and creates the results and data folders in this folder.
+First, run:
+```
+bash getfiles.sh
+```
+to grab everything you need.  This will also run `bash varmake.sh` and create vt decomposed and normalized files for the gnomAD VCF annotated with appropriate VEP fields.  It may take a while.  This also uses `get-chain.py` to create the self-chain file and creates the `results` and `data` folders in this folder.  The output of this script goes entirely into the `data` folder.  The segmental duplication and self-chain files `segmental.bed.gz` and `self-chains.id90.bed.gz` are placed into this folder, the GRCh37 FASTA file `grch37.fa`, the Ensembl exons GTF file `Homo_sapiens.GRCh37.75.gtf.gz`, the first version gnomAD VCF `gnomad.exomes.r2.0.1.sites.vcf.gz`, and lastly the coverage files for gnomAD labeled as `gnomad.exomes.r2.0.2.chr$i.coverage.txt.gz` with `$i` replaced with each chromosome name.  The `varmake.sh` script takes the gnomAD VCF file and outputs a decomposed, normalized, VEP-annotated file called `gnomad-vep-vt.vcf.gz` in the same folder.
 
-Then run `bash sbatch.sh` to run the jobs individually.  This can be sent to a compute cluster if preferred.
-This script runs `regions.sh` and contains the examples of how the code is run to obtain the versions used in the manuscript.
+Then run:
+```
+bash sbatch.sh
+```
+to run `regions.sh` for all versions of the model found in the manuscript.  It contains examples of how the code is run to obtain the versions used in the manuscript.  It creates output using `regions.sh` in three folders.  `results/gnomAD10.x5syn` is the full autosome-based model used in the paper.  `results/ExACv1syn` is the version for ExAC v1 which only uses 60,706 exomes which is also referenced in the paper's supplementary figures.  Lastly, `results/Xchromonly` is the X chromosome only version of CCR, dubbed X-CCR, which is also referenced in the paper's supplement.
+
+In each results folder, `weightedresiduals-cpg-synonymous-novariant.txt` is the final file containing all CCRs with appropriately adjusted percentiles.  The `resids-cpg-synonymous-novariant.txt` is the file before size-weighted percentile adjustment, and `exac-regions-novariant.txt` is the file of all the regions generated with no model applied to ranking them at all.
 
 ### regions.sh
 
-So to run the model as we did in the manuscript, we used the following command:
-
+So to run the full autosomal model as we did in the manuscript, we used the following command:
 ```
 bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g
 ```
-
 So the options for running `regions.sh` are as follows:
 
 + -v allows you to choose the name of the results folder you store the results in. This will be in the directory results inside of this folder. It can be a name, the date you ran it, whatever you like.
