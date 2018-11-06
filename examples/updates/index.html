@@ -120,11 +120,52 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#creating-ccrs-with-gnomad-21-and-new-ensembl-builds">Creating CCRs with gnomAD 2.1 and new Ensembl builds.</a></li>
+            <li class="second-level"><a href="#newccrssh">newccrs.sh</a></li>
+                
+            <li class="second-level"><a href="#about-the-model-code">About the model code</a></li>
+                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<p>Soon to have scripts for running with gnomAD 2.1 and new Ensembl builds.</p></div>
+<h1 id="creating-ccrs-with-gnomad-21-and-new-ensembl-builds">Creating CCRs with gnomAD 2.1 and new Ensembl builds.</h1>
+<p>This repo will allow you to create the model for the new Ensembl format and the new INFO-field-heavy gnomAD.  This is a great way to get a quickstart on how the model is run.  Run these two simple bash commands and it will run all the python scripts and bash code you need to grab all files and create the CCR model files.</p>
+<p>First, run:</p>
+<pre><code>bash newfiles.sh
+</code></pre>
+
+<p>to grab everything you need.  This will also run <code>bash varmake.sh</code> and create vt decomposed and normalized files for the gnomAD VCF annotated with appropriate VEP fields.  It may take a while.  This also uses <code>get-chain.py</code> to create the self-chain file and creates the <code>results</code> and <code>data</code> folders in this folder.  The output of this script goes entirely into the <code>data</code> folder.  The segmental duplication and self-chain files <code>segmental.bed.gz</code> and <code>self-chains.id90.bed.gz</code> are placed into this folder, the GRCh37 FASTA file <code>grch37.fa</code>, the final version of GRCh37 Ensembl exons GTF file <code>Homo_sapiens.GRCh37.85.gtf.gz</code>, the version 2.1 gnomAD VCF <code>gnomad.exomes.r2.1.sites.vcf.bgz</code>, and lastly the coverage file for gnomAD 2.1 labeled as <code>gnomad.exomes.coverage.summary.tsv.bgz</code>.  The <code>varmake.sh</code> script takes the gnomAD VCF file and outputs a decomposed, normalized, VEP-annotated file called <code>gnomad2.1-vep-vt.vcf.gz</code> in the same folder.</p>
+<p>Then run:</p>
+<pre><code>bash newrun.sh
+</code></pre>
+
+<p>to run <code>newccrs.sh</code> for all versions of the model found in the manuscript.  It contains examples of how the code is run to obtain the versions used in the manuscript.  It creates output using <code>newccrs.sh</code> in two folders.  <code>results/newgnomAD10.x5</code> is the full autosome-based model.  Lastly, <code>results/newXchrom</code> is the X chromosome only version of CCR, dubbed X-CCR, which is also referenced in the paper's supplement.</p>
+<p>In each results folder, <code>weightedresiduals-cpg-synonymous-novariant.txt</code> is the final file containing all CCRs with appropriately adjusted percentiles.  The <code>resids-cpg-synonymous-novariant.txt</code> is the file before size-weighted percentile adjustment, and <code>exac-regions-novariant.txt</code> is the file of all the regions generated with no model applied to ranking them at all.</p>
+<h3 id="newccrssh">newccrs.sh</h3>
+<p>So to run the full autosomal model as we did in the manuscript, we used the following command:</p>
+<pre><code>bash newccrs.sh -c -w -s -v newgnomAD10x.5 -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -u
+</code></pre>
+
+<p>So the options for running <code>newccrs.sh</code> are as follows:</p>
+<ul>
+<li>-v allows you to choose the name of the results folder you store the results in. This will be in the directory results inside of this folder. It can be a name, the date you ran it, whatever you like.</li>
+<li>-x allows you to pass files of choice (you don't have to pass any) to exclude regions from the genome when generating your model.  We recommend excluding segmental duplications and self-chains of 90% sequence identity, as these regions are unreliable when short reads are used to call variants.</li>
+<li>-s tells the model to calculate synonymous variant density, which you may not want as the model takes a lot longer to do so. If you do this without the -c option for CpG, it will calculate a model based on coverage-scaled length and synonymous density instead of CpG content.</li>
+<li>-u removes synonymous density from the model and just puts it as a field in the BED file.  We did this for our model version, CpG content only.</li>
+<li>-c triggers CpG density input into the model.  This is the version used in the manuscript.  It will always be calculated.</li>
+<li>-n will prevent singletons from being used in the model.  If you do not believe in variants that occur only once in your VCF input file, this may be an option you are interested in.</li>
+<li>-f will use a FASTA file of your choice to calculate CpG density.  The default is the GRCh37/hg19 FASTA downloaded from our s3 server by getfiles.sh. </li>
+<li>-w is the version we used in the manuscript where variants are separate from CCRs.  Variants are merged together if overlapping INDELs and treated as one large region of non-constraint.  It may be you want to incorporate variants into the regions, but the code to do so is quite old.  We recommend that you use this version.</li>
+<li>-d allows you to pass a coverage depth and a coverage cutoff into the model.  As in the manuscript the default is 10x at 50%.  So, 10 and 0.5.  Separate inputs with spaces.</li>
+<li>-r allows you to only run the model on one chromosome or a couple if you like.  We used this option to run CCRs just for the X chromosome quickly, as in the manuscript. Like -d, separate inputs with spaces.</li>
+<li>-q will let you exclude certain chromosomes from your analysis.  The default is Y but as in the manuscript, we recommend using this to get autosomal CCRs and excluding X and Y.  But if you want everything just run with a blank.  Like -d, separate inputs with spaces.</li>
+</ul>
+<h3 id="about-the-model-code">About the model code</h3>
+<p><code>newccrs.sh</code> will run <code>exac-regions.py</code> and <code>resid-plot.py</code> (it also runs <code>weightpercentile.py</code>) using the above.  If you want more information on the inputs to those individual functions, just run the python scripts with -h to get the descriptions of all the inputs.  You do not have to use regions.sh to run the model.</p>
+<p><code>exac-regions.py</code> is the python code that generates the regions.  It utilizes the functions in the script <code>utils.py</code> to do so.  The functions in <code>utils.py</code> would need to be modified if you wanted to change the way regions are calculated.  <code>exac-regions.py</code> runs using parallel processing, so debugging may be difficult for those less experienced.</p>
+<p><code>resid-plot.py</code> is the code to create the model and calculate synonymous density.  Synonymous density calculation currently takes a very long time, so it may be in the interest of the user to forgo the calculation if iterating through several different model versions.</p>
+<p><code>weightpercentile.py</code> calculates the length-scaled percentiles off of the far-less balanced ones generated by <code>resid-plot.py</code>.  It is highly recommened you use this script to create the final percentiles. </p></div>
         
     </div>
 

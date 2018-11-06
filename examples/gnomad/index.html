@@ -144,7 +144,7 @@
 <p>In each results folder, <code>weightedresiduals-cpg-synonymous-novariant.txt</code> is the final file containing all CCRs with appropriately adjusted percentiles.  The <code>resids-cpg-synonymous-novariant.txt</code> is the file before size-weighted percentile adjustment, and <code>exac-regions-novariant.txt</code> is the file of all the regions generated with no model applied to ranking them at all.</p>
 <h3 id="regionssh">regions.sh</h3>
 <p>So to run the full autosomal model as we did in the manuscript, we used the following command:</p>
-<pre><code>bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g
+<pre><code>bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g -u
 </code></pre>
 
 <p>So the options for running <code>regions.sh</code> are as follows:</p>
