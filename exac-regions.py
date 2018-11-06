@@ -224,6 +224,9 @@ def perchrom(vcf_chrom):
 
     out = []
     for chrom_gene, trows in it.groupby(rows, lambda row: (row['chrom'], row['gene'])):
+        if not chrom_gene in gene_exon_starts: 
+            sys.stderr.write("skipping:" + str(chrom_gene) + " as it was not pulled from GTF\n")
+            continue
         exon_starts = gene_exon_starts[chrom_gene]
         exon_ends = gene_exon_ends[chrom_gene]
         last = exon_starts[0]
@@ -365,9 +368,11 @@ def perchrom(vcf_chrom):
         outs.append(d)
     return outs
 
+from itertools import imap
 import multiprocessing as mp
 p = mp.Pool(22)
 
 for outs in p.imap_unordered(perchrom, ((VCF, str(chrom)) for chrom in chroms)):
+#for outs in imap(perchrom, ((VCF, str(chrom)) for chrom in chroms if chrom == '18')):
     for d in outs:
         print("\t".join(map(str, (d[k] for k in keys))))

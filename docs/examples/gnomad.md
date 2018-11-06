@@ -17,11 +17,17 @@ to run `regions.sh` for all versions of the model found in the manuscript.  It c
 
 In each results folder, `weightedresiduals-cpg-synonymous-novariant.txt` is the final file containing all CCRs with appropriately adjusted percentiles.  The `resids-cpg-synonymous-novariant.txt` is the file before size-weighted percentile adjustment, and `exac-regions-novariant.txt` is the file of all the regions generated with no model applied to ranking them at all.
 
+Lastly, to create the bgzipped, sorted and tabixed bedfiles, as seen on the CCR browser run:
+```
+bash makebeds.sh
+```
+which will create the appropriately versioned bgzipped bedfiles in the corresponding results folders.
+
 ### regions.sh
 
 So to run the full autosomal model as we did in the manuscript, we used the following command:
 ```
-bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g
+bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g -u
 ```
 So the options for running `regions.sh` are as follows:
 

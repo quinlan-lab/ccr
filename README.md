@@ -7,6 +7,8 @@ The constrained coding regions model (CCR) uses the power of the Genome Aggregat
 
 The most constrained regions (&ge;90th percentile) have been shown to be extremely enriched for pathogenic variation in ClinVar, _de novo_ mutations in patients with severe developmental disorders, and critical Pfam domains exome-wide.  Even more exciting, 72% of genes harboring a CCR in the 99th percentile or higher have no known pathogenic variants.  There is great opportunity for discovery of function in these understudied genes as well as their role in disease phenotypes or potentially even in embryonic lethality when altered.
 
+Go to INSTALL to see all packages and software necessary to run the model.
+
 Click on the badge below to read the docs and learn more about how to run the model.
 
 [![Docs](https://img.shields.io/badge/docs-latest-blue.svg?style=for-the-badge)](https://quinlan-lab.github.io/ccr/)

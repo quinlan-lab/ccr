@@ -1,0 +1,9 @@
+# creates files as seen on the CCR browser
+ver=v2
+date=20180420
+sed '1d' results/gnomAD10x.5syn/weightedresiduals-cpg-synonymous-novariant.txt | sort -k1,1 -k2,2n | bgzip -c -@ 12 > results/gnomAD10x.5syn/gnomad10x.5syn-ccrs.bed.gz; tabix -f results/gnomAD10x.5syn/gnomad10x.5syn-ccrs.bed.gz
+sed '1d' results/Xchromonly/weightedresiduals-cpg-synonymous-novariant.txt | sort -k1,1 -k2,2n | bgzip -c -@ 12 > results/Xchromonly/xchrom-ccrs.bed.gz; tabix -f results/Xchromonly/xchrom-ccrs.bed.gz
+sed '1d' results/ExACv1syn/weightedresiduals-cpg-synonymous-novariant.txt | sort -k1,1 -k2,2n | bgzip -c -@ 12 > results/ExACv1syn/exacv1syn-ccrs.bed.gz; tabix -f results/ExACv1syn/exacv1syn-ccrs.bed.gz
+zcat < results/gnomAD10x.5syn/gnomad10x.5syn-ccrs.bed.gz | sort -k14,14nr | awk 'BEGIN{key=""; val=0} {{if (key !=$4 $7) val+=1} print $0 "\t" val; key=$4 $7}' | cut -f -4,7- | awk '{printf $1 "\t" $2 "\t" $3 "\t" $(NF-1)} {for (i = 4; i <= NF-2; i++) {printf "\t" $i}} {printf "\t" $NF "\n"}' | sort -k1,1 -k2,2n | cat <(printf "#chrom\tstart\tend\tccr_pct\tgene\tranges\tvarflag\tsyn_density\tcpg\tcov_score\tresid\tresid_pctile\tunique_key\n") - | bgzip -c > results/gnomAD10x.5syn/ccrs.autosomes.$ver.$date.bed.gz; tabix results/gnomAD10x.5syn/ccrs.autosomes.$ver.$date.bed.gz
+zcat < results/Xchromonly/xchrom-ccrs.bed.gz | sort -k14,14nr | awk 'BEGIN{key=""; val=0} {{if (key !=$4 $7) val+=1} print $0 "\t" val; key=$4 $7}' | cut -f -4,7- | awk '{printf $1 "\t" $2 "\t" $3 "\t" $(NF-1)} {for (i = 4; i <= NF-2; i++) {printf "\t" $i}} {printf "\t" $NF "\n"}' | sort -k1,1 -k2,2n | cat <(printf "#chrom\tstart\tend\tccr_pct\tgene\tranges\tvarflag\tsyn_density\tcpg\tcov_score\tresid\tresid_pctile\tunique_key\n") - | bgzip -c > results/Xchromonly/ccrs.xchrom.$ver.$date.bed.gz; tabix results/Xchromonly/ccrs.xchrom.$ver.$date.bed.gz
+# from here on you can refer to the CCR browser repo at https://github.com/quinlan-lab/ccrhtml for making the BED12 and bedGraph files

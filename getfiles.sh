@@ -41,21 +41,22 @@ if [ `ls -1 data/gnomad.exomes.r2.0.2.chr* 2>/dev/null | wc -l ` -eq 0 ]; then
 fi
 
 # if and only if you want ExAC v1 for some reason:
-#if [ `ls -1 data/ExAC.r1.sites.vep.vcf.gz* 2>/dev/null | wc -l ` -eq 0 ]; then
-    #wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/ExAC.r1.sites.vep.vcf.gz
-    #wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/ExAC.r1.sites.vep.vcf.gz.tbi
-#fi
-#if [ `ls -1 data/Panel.chr* 2>/dev/null | wc -l ` -eq 0 ]; then
-    #for i in {1..22} X Y; do wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/coverage/Panel.chr$i.coverage.txt.gz; done
-    #for i in {1..22} X Y; do wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/coverage/Panel.chr$i.coverage.txt.gz.tbi; done
-#fi
+if [ `ls -1 data/ExAC.r1.sites.vep.vcf.gz* 2>/dev/null | wc -l ` -eq 0 ]; then
+    wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/ExAC.r1.sites.vep.vcf.gz
+    wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/ExAC.r1.sites.vep.vcf.gz.tbi
+fi
+if [ `ls -1 data/Panel.chr* 2>/dev/null | wc -l ` -eq 0 ]; then
+    for i in {1..22} X Y; do wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/coverage/Panel.chr$i.coverage.txt.gz; done
+    for i in {1..22} X Y; do wget -P data ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/coverage/Panel.chr$i.coverage.txt.gz.tbi; done
+fi
 
 #gnomAD
 #v2.0.1
 if [ ! -s data/gnomad-vep-vt.vcf.gz ]; then
     bash varmake.sh data/gnomad.exomes.r2.0.1.sites.vcf.gz
 fi
-# v2.0.2
-#if [ ! -s data/gnomad-vep-vt.vcf.gz ]; then
-#    bash varmake.sh data/gnomad.exomes.r2.0.2.sites.vcf.bgz
-#fi
+#ExAC
+#v1 (final)
+if [ ! -s data/ExAC-vep-vt.vcf.gz ]; then
+    bash varmake.sh data/ExAC.r1.sites.vep.vcf.gz
+fi

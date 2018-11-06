@@ -357,7 +357,12 @@ def read_coverage(chrom, cov=10, length=249250621, path="data/exacv2.chr{chrom}.
     """
 
     cols = "chrom	pos	mean	median	1	5	10	15	20	25	30	50 100".split()
-    coli = cols.index(str(cov)) + 1
+    def index_containing_substring(the_list, substring): # added because gnomAD v2.1 has "over_10" instead of 10
+        for i, s in enumerate(the_list):
+            if substring in s:
+                return i
+        return -1
+    coli = index_containing_substring(cols,str(cov)) + 1
     path=path.format(**locals()) 
     # just extract the position (2) and the requested column
     p = subprocess.Popen("tabix {path} {chrom} | cut -f 2,{coli} ".format(**locals()), # {path}/exacv2.chr{chrom}.cov.txt.gz #{path}/Panel.chr{chrom}.coverage.txt.gz
@@ -380,7 +385,6 @@ def read_coverage(chrom, cov=10, length=249250621, path="data/exacv2.chr{chrom}.
 
 
 def read_exons(gtf, chrom, cutoff, coverage_array, exclude):
-    from itertools import compress
     genes = defaultdict(IntervalSet)
     splitters = defaultdict(IntervalSet)
 
@@ -408,12 +412,9 @@ def read_exons(gtf, chrom, cutoff, coverage_array, exclude):
             #    f2.write("\t".join(toks)+"\n") # segdups
                 
     for toks in (x.rstrip('\r\n').split("\t") for x in ts.nopen(gtf) if x[0] != "#"):
-        splits=toks[-1].split(";")
-        bools=['gene_biotype' in i for i in splits]
-        biotype=list(compress(splits,bools))[0].strip()
-        print >> sys.stderr, biotype
-        if toks[2] not in("CDS", "stop_codon") or "protein_coding" not in biotype: continue
-        #if toks[0] != "1": break
+        if not (any(["protein_coding" in s for s in toks[-1].split(";") if 'transcript_biotype' in s]) or toks[1] == "protein_coding"):
+            continue
+        if toks[2] not in ("CDS", "stop_codon"): continue
         start, end = map(int, toks[3:5])
         gene = toks[8].split('gene_name "')[1].split('"', 1)[0]
         assert start <= end, toks
