@@ -26,14 +26,6 @@ while getopts ":v:x:d:r:q:usegcnwf:" opt; do
             echo "-only calculating synonymous density, not adding to the model" >&2
             u="-r"
             ;;
-        e)
-            echo "-using exac v1" >&2
-            ver=1
-            ;;
-        g)
-            echo "-using gnomad" >&2
-            ver=2
-            ;;
         c)
             echo "-CpG density input into the model was triggered" >&2
             cpg="-c"
@@ -85,19 +77,9 @@ while getopts ":v:x:d:r:q:usegcnwf:" opt; do
     esac
 done
 echo $nochrom
-### for when something is absolutely required in this script
-#if [ -z "$file" ]; then
-#  echo "-f [option] is required"
-#  exit
-#fi
 mkdir -p results/$date/tmp
-## generates regions and residuals files ## "${exclude[0]}" "${exclude[1]}"
-if [ $ver -eq 2 ]; then
-    python exac-regions.py $ns $var -c "data/gnomad.exomes.r2.0.2.chr{chrom}.coverage.txt.gz" -e data/Homo_sapiens.GRCh37.75.gtf.gz -x data/gnomad-vep-vt.vcf.gz -d "${depth[0]}" -l "${depth[1]}" $x "${exclude[@]}" -f data/grch37.fa > results/$date/exac-regions$n$w.txt # added $file as a placeholder for now, so we don't always hard code files
-fi
-if [ $ver -eq 1 ]; then
-    python exac-regions.py $ns $var -c "data/Panel.chr{chrom}.coverage.txt.gz" -e data/Homo_sapiens.GRCh37.75.gtf.gz -x $DATA/ExAC-vep-vt.vcf.gz -d "${depth[0]}" -l "${depth[1]}" > results/$date/exac-regions$n$w.txt # added $file as a placeholder for now, so we don't always hard code files
-fi
+## generates regions and residuals files
+python exac-regions.py $ns $var -c "data/gnomad.exomes.coverage.summary.tsv.bgz" -e data/Homo_sapiens.GRCh37.85.gtf.gz -x data/gnomad2.1-vep-vt.vcf.gz -d "${depth[0]}" -l "${depth[1]}" $x "${exclude[@]}" -f data/grch37.fa > results/$date/exac-regions$n$w.txt
 python resid-plot.py $ns $syn $cpg $var $u $r "${chrom[@]}" $q "${nochrom[@]}" -f results/$date/exac-regions$n$w.txt > results/$date/resids$c$s$n$w.txt
 cat <(head -1 results/$date/resids$c$s$n$w.txt) <(sed '1d' results/$date/resids$c$s$n$w.txt | sort -k12,12nr) > results/$date/tmp/residsort$c$s$n$w.txt
 python weightpercentile.py results/$date/tmp/residsort$c$s$n$w.txt > results/$date/weightedresiduals$c$s$n$w.txt

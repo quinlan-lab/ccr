@@ -1,7 +1,7 @@
 CCR Scripts
 ==============
 
-This repo will allow you to create the model as we did.  If you want to run the model as in the paper, go to [Examples --> gnomAD](examples/gnomad.md) above.  New versions are under Examples --> New Versions.
+This repo will allow you to create the model as we did.  If you want to run the model as in the paper, go to [Examples --> gnomAD](examples/gnomad.md) above.  New versions are under [Examples --> New Versions](examples/updates.md).
 
 exac-regions.py
 ---
