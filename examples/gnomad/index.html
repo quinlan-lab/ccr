@@ -142,6 +142,11 @@
 
 <p>to run <code>regions.sh</code> for all versions of the model found in the manuscript.  It contains examples of how the code is run to obtain the versions used in the manuscript.  It creates output using <code>regions.sh</code> in three folders.  <code>results/gnomAD10.x5syn</code> is the full autosome-based model used in the paper.  <code>results/ExACv1syn</code> is the version for ExAC v1 which only uses 60,706 exomes which is also referenced in the paper's supplementary figures.  Lastly, <code>results/Xchromonly</code> is the X chromosome only version of CCR, dubbed X-CCR, which is also referenced in the paper's supplement.</p>
 <p>In each results folder, <code>weightedresiduals-cpg-synonymous-novariant.txt</code> is the final file containing all CCRs with appropriately adjusted percentiles.  The <code>resids-cpg-synonymous-novariant.txt</code> is the file before size-weighted percentile adjustment, and <code>exac-regions-novariant.txt</code> is the file of all the regions generated with no model applied to ranking them at all.</p>
+<p>Lastly, to create the bgzipped, sorted and tabixed bedfiles, as seen on the CCR browser run:</p>
+<pre><code>bash makebeds.sh
+</code></pre>
+
+<p>which will create the appropriately versioned bgzipped bedfiles in the corresponding results folders.</p>
 <h3 id="regionssh">regions.sh</h3>
 <p>So to run the full autosomal model as we did in the manuscript, we used the following command:</p>
 <pre><code>bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g -u

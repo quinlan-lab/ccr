@@ -142,6 +142,11 @@
 
 <p>to run <code>newccrs.sh</code> for all versions of the model found in the manuscript.  It contains examples of how the code is run to obtain the versions used in the manuscript.  It creates output using <code>newccrs.sh</code> in two folders.  <code>results/newgnomAD10.x5</code> is the full autosome-based model.  Lastly, <code>results/newXchrom</code> is the X chromosome only version of CCR, dubbed X-CCR, which is also referenced in the paper's supplement.</p>
 <p>In each results folder, <code>weightedresiduals-cpg-synonymous-novariant.txt</code> is the final file containing all CCRs with appropriately adjusted percentiles.  The <code>resids-cpg-synonymous-novariant.txt</code> is the file before size-weighted percentile adjustment, and <code>exac-regions-novariant.txt</code> is the file of all the regions generated with no model applied to ranking them at all.</p>
+<p>Lastly, to create the bgzipped, sorted and tabixed bedfiles, as seen on the CCR browser run:</p>
+<pre><code>bash newbeds.sh
+</code></pre>
+
+<p>which will create the appropriately versioned bgzipped bedfiles in the corresponding results folders.</p>
 <h3 id="newccrssh">newccrs.sh</h3>
 <p>So to run the full autosomal model as we did in the manuscript, we used the following command:</p>
 <pre><code>bash newccrs.sh -c -w -s -v newgnomAD10x.5 -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -u
