@@ -29,6 +29,7 @@ So to run the full autosomal model as we did in the manuscript, we used the foll
 ```
 bash regions.sh -c -s -w -v gnomAD10x.5syn -d 10 -d 0.5 -x data/segmental.bed.gz -x data/self-chains.id90.bed.gz -q X -q Y -g -u
 ```
+
 So the options for running `regions.sh` are as follows:
 
 + -v allows you to choose the name of the results folder you store the results in. This will be in the directory results inside of this folder. It can be a name, the date you ran it, whatever you like.
