@@ -11,6 +11,25 @@ The constrained coding regions model (CCR) uses the power of the Genome Aggregat
 
 The most constrained regions (&ge;90th percentile) have been shown to be extremely enriched for pathogenic variation in ClinVar, _de novo_ mutations in patients with severe developmental disorders, and critical Pfam domains exome-wide.  Even more exciting, 72% of genes harboring a CCR in the 99th percentile or higher have no known pathogenic variants.  There is great opportunity for discovery of function in these understudied genes as well as their role in disease phenotypes or potentially even in embryonic lethality when altered.
 
+After downloading the CCR files at the [CCR Browser](https://rebrand.ly/ccrregions), note the meaning of the columns in the file is as described at the [browser repo](https://github.com/quinlan-lab/ccrhtml):
+
+#### BED file columns
+Column              | Description |
+--------            | ----------- |
+chrom               | Chromosome ID  
+start               | Start coordinate (may be part of a multi-exon CCR)
+end                 | End coordinate (may be part of a multi-exon CCR)
+ccr_pct             | CCR percentile.  0 represents ExAC variants and is total non-constraint.  100 represents complete constraint, the highest constrained region in the model. 
+gene                | HGNC gene name.
+ranges              | The range of coordinates that represent the CCR.  For multi-exon spanning CCRs, this will be a comma-separated list of ranges.
+varflag             | VARTRUE = 0th percentile CCR, and thus an ExAC variant coordinate (or several ExAC deletions merged into one CCR).  VARFALSE = Anything that is not a 0th percentile CCR. 
+syn_density         | A calculation of the synonymous variant density of the CCR region.  Used variants that were SNPs and did not change amino acids or stop/start codons.  Allowed multiple alleles at same bp.
+cpg                 | CpG dinucleotide density of the whole CCR region. 
+cov_score           | The score of length scaled by coverage proportion at 10x for each base pair.  
+resid               | Raw residual value from the linear regression model. 
+resid_pctile        | Raw residual percentile, not weighted by proportion of exome represented.
+unique_key          | A unique key ID for each CCR.
+
 
 Go to INSTALL to see all packages and software necessary to run the model.
 
