@@ -8,24 +8,35 @@ Go to INSTALL to see all packages and software necessary to run the model.
  
 --------------
 
+Overview
+========
+This repository is linked to our [manuscript](https://www.nature.com/articles/s41588-018-0294-6) describing constrained coding regions in the human genome. If you would like to view CCRs throughout the genome or download the model in its most current form, go to the [CCR Browser](https://www.rebrand.ly/ccrregions).  The version used in the paper, which is the version currently available for download utilizes the hg19/GRCh37 reference genome.
+
+The constrained coding regions model (CCR) uses the Genome Aggregation Database (gnomAD, version 2.0.1) to reveal regions of protein coding genes that are likely to be under potentially purifiying selection. We used protein-altering variation from across 123,136 ostensibly healthy individuals' exomes to reveal coding regions that completely devoid of any protein-coding variation . We infer such coding regions to be constrained; the higher the constraint percentile, the more constrained we predict the region to be. 
+
+The most constrained regions (&ge;90th percentile, and especially at or above the &ge;99th percentile) have been shown to be extremely enriched for pathogenic variation in ClinVar, _de novo_ mutations in patients with severe developmental disorders, and critical Pfam domains exome-wide.  Even more exciting, 72% of genes harboring a CCR in the 99th percentile or higher have no known pathogenic variants.  There is great opportunity for discovery of function in these understudied genes as well as their role in disease phenotypes or potentially even in embryonic lethality when altered.
+
+Citation
+========
 If you use this model in any way, please cite the paper:
 
 [Havrilla, J.M., Pedersen, B.S., Layer, R.M. & Quinlan, A.R. A map of constrained coding regions in the human genome. Nature Genetics (2018). doi:10.1038/s41588-018-0294-6](https://www.nature.com/articles/s41588-018-0294-6)
 
-This repository is linked to our Nature Genetics manuscript on constrained coding regions in the human genome. If you would like to view CCRs throughout the genome or download the model in its most current form, go to the [CCR Browser](https://rebrand.ly/ccrregions).  The version used in the paper, which is the version currently available for download utilizes the hg19/GRCh37 reference genome.
+CCR BED Files
+=============
+- [Autosomal CCR regions in extended BED format (gnomaD v2.0.1)](https://s3.us-east-2.amazonaws.com/ccrs/ccrs/ccrs.autosomes.v2.20180420.bed.gz)
+- [X chromosome CCR regions in extended BED format (gnomaD v2.0.1)](https://s3.us-east-2.amazonaws.com/ccrs/ccrs/ccrs.xchrom.v2.20180420.bed.gz)
+- [Autosomal CCR regions at 90th percentile and higher in extended BED format (gnomaD v2.0.1)](https://s3.us-east-2.amazonaws.com/ccrs/ccrs/ccrs.autosomes.90orhigher.v2.20180420.bed.gz)
+- [X chromosome CCR regions at 90th percentile and higher in extended BED format (gnomaD v2.0.1)](https://s3.us-east-2.amazonaws.com/ccrs/ccrs/ccrs.xchrom.90orhigher.v2.20180420.bed.gz)
 
-The constrained coding regions model (CCR) uses the power of the Genome Aggregation Database (gnomAD) to discover areas of the human exome under potentially purifiying selection.  Using protein-altering variation from across 123,136 ostensibly healthy individuals' exomes as the boundaries of each region of constraint, we create regions completely devoid of any protein-coding variation. These regions' size is variable and dependent upon where the variants lie. The model then ranks these regions using a linear regression of coverage-weighted length against the CpG content of those regions.
-
-The most constrained regions (&ge;90th percentile) have been shown to be extremely enriched for pathogenic variation in ClinVar, _de novo_ mutations in patients with severe developmental disorders, and critical Pfam domains exome-wide.  Even more exciting, 72% of genes harboring a CCR in the 99th percentile or higher have no known pathogenic variants.  There is great opportunity for discovery of function in these understudied genes as well as their role in disease phenotypes or potentially even in embryonic lethality when altered.
-
-After downloading the CCR files at the [CCR Browser](https://rebrand.ly/ccrregions), note the meaning of the columns in the file is as described at the [browser repo](https://github.com/quinlan-lab/ccrhtml):
+Each column in the above CCR BED files is described below:
 
 #### BED file columns
 Column              | Description |
 --------            | ----------- |
 chrom               | Chromosome ID  
-start               | Start coordinate (may be part of a multi-exon CCR)
-end                 | End coordinate (may be part of a multi-exon CCR)
+start               | Start coordinate (0-based, may be part of a multi-exon CCR)
+end                 | End coordinate (1-based, may be part of a multi-exon CCR)
 ccr_pct             | CCR percentile.  0 represents ExAC variants and is total non-constraint.  100 represents complete constraint, the highest constrained region in the model. 
 gene                | HGNC gene name.
 ranges              | The range of coordinates that represent the CCR.  For multi-exon spanning CCRs, this will be a comma-separated list of ranges.
